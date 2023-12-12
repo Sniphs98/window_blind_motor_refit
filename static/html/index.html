@@ -1,0 +1,63 @@
+<head>
+  <link rel="stylesheet" href="./static/css/index.css" />
+  <script src="static/js/index.js"></script>
+</head>
+<body>
+  <div id="loader" class="center"></div>
+  <div class="center-div">
+    <div class="grid-container">
+      <div class="grid-item" id="item-1">
+        <div class="center-div">
+          <h1>Fenster Steuerung</h1>
+        </div>
+      </div>
+      <button
+        onclick="setRolloPreset(100)"
+        class="grid-item fifth-button"
+        id="button-100"
+      >
+        100%
+      </button>
+
+      <button
+        onclick="setRolloPreset(75)"
+        class="grid-item first-button"
+        id="button-75"
+      >
+        75%
+      </button>
+      <button
+        onclick="setRolloPreset(50)"
+        class="grid-item secent-button"
+        id="button-50"
+      >
+        50%
+      </button>
+      <button
+        onclick="setRolloPreset(25)"
+        class="grid-item secent-button"
+        id="button-25"
+      >
+        25%
+      </button>
+      <button
+        onclick="setRolloPreset(0)"
+        class="grid-item fourth-button"
+        id="button-0"
+      >
+        0%
+      </button>
+      <div id="button-window">
+        <div id="boarder">
+          <div id="window">
+            <div id="rollo">
+              <!-- <div id="touchBar"></div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+      <button id="button-set" onclick="setRollo()">0%</button>
+    </div>
+  </div>
+</body>
+
