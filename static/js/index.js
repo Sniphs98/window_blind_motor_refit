@@ -1,6 +1,6 @@
 function updateLabel(value) {
   var button = document.getElementById("button-set");
-  button.innerText = value + "%";
+  button.innerText = "set " + value + "%";
 }
 
 window.addEventListener("DOMContentLoaded", (event) => {
@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", (event) => {
     if (newHeight > rolloMaxHeight) {
       newHeight = rolloMaxHeight;
     }
-    if (newHeight < 15) {
+    if (newHeight < 1) {
       newHeight = 15;
     }
     rollo.style.height = newHeight + "px";
@@ -77,15 +77,3 @@ window.addEventListener("DOMContentLoaded", (event) => {
       "http://" + serverAddress + "/api/preset/" + presetValue;
   }
 });
-
-document.onreadystatechange = function () {
-  if (document.readyState !== "complete") {
-    document.querySelector("body").style.visibility = "hidden";
-    document.querySelector("#loader").style.visibility = "visible";
-  } else {
-    document.querySelector("#loader").style.display = "none";
-    document.querySelector("body").style.visibility = "visible";
-  }
-};
-
-
