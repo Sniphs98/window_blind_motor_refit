@@ -10,7 +10,7 @@ import uasyncio as asyncio
 import time
 import network
 import sys
-import os
+
 
 IN1 = Pin(26,Pin.OUT)
 IN2 = Pin(25,Pin.OUT)
@@ -25,9 +25,9 @@ sequence_down = [[1,0,0,0],[1,0,0,1],[0,0,0,1],[0,0,1,1],[0,0,1,0],[0,1,1,0],[0,
 app = Microdot()
 logger = Logger()
 configurator = Configurator(logger)
-server_address = ""
-server_static_ip = '192.168.178.107'
-windowMaxSteps = 13520
+
+server_static_ip = ''
+windowMaxSteps = 100
 windowOpenProcent = 0
        
 def one_rotation_up():
@@ -140,8 +140,6 @@ def by_procent(request, procent):
     led_off()
     return redirect('/')
 
-
-
 def rollo_up_procent(procent):
     logger.log("up")
     logger.log(procent)
@@ -203,23 +201,23 @@ def test_print(request):
 #     logger.log("Server:", server_address)
 #     return wlan.ifconfig()[0]
     
-# def connect_static_ip():
-#     try:
-#         logger.log("Attempting to establish connection...")
-#         wlan = network.WLAN(network.STA_IF)
-#         if not wlan.isconnected():
-#             wlan.active(True)
-#             wlan.ifconfig((server_static_ip, '255.255.255.0', '192.168.178.1', '192.168.178.1'))
-#             wlan.connect(WIFI_SSID, WIFI_PASS)
-#         while not wlan.isconnected():
-#             time.sleep(1)
-#             logger.log("Connection successfully established. IP address:" + wlan.ifconfig()[0])
-#         else:
-#             logger.log("Already connected. IP address:" + wlan.ifconfig()[0])
-# 
-#     except Exception as e:
-#         logger.log("WLAN Exception:" + str(e))
-#         sys.exit(1)
+def connect_static_ip():
+    try:
+        logger.log("Attempting to establish connection...")
+        wlan = network.WLAN(network.STA_IF)
+        if not wlan.isconnected():
+            wlan.active(True)
+            wlan.ifconfig((server_static_ip, '255.255.255.0', '192.168.178.1', '192.168.178.1'))
+            wlan.connect(WIFI_SSID, WIFI_PASS)
+        while not wlan.isconnected():
+            time.sleep(1)
+            logger.log("Connection successfully established. IP address:" + wlan.ifconfig()[0])
+        else:
+            logger.log("Already connected. IP address:" + wlan.ifconfig()[0])
+
+    except Exception as e:
+        logger.log("WLAN Exception:" + str(e))
+        sys.exit(1)
 
 def connect_to_wifi(SSID_and_PASS):
     try:
@@ -236,6 +234,9 @@ def connect_to_wifi(SSID_and_PASS):
         if wlan.isconnected():
             logger.log("Connected to WLAN:" + str(ssid))
             logger.log("With IP address:" + wlan.ifconfig()[0])
+            configurator.set_value("SSID" , ssid)
+            configurator.set_value("PASS" , password)
+            configurator.set_value("STATIC_IP" , wlan.ifconfig()[0])
             return True
         else:
             logger.log("Connection to WLAN failed.")
@@ -245,6 +246,12 @@ def connect_to_wifi(SSID_and_PASS):
         logger.log("Error in WLAN connection:" + str(e))
         return False
 
+def wlan_crodenselts_existing():
+    if len(configurator.get_value("SSID")) == 0 or len(configurator.get_value("PASS")) == 0:
+        logger.log("SSID or PASS not set")
+        return False
+    logger.log("WLAN crodenselts existing")
+    return True
 
 def numer_input(consol_out):
     logger.log(consol_out)
@@ -271,15 +278,11 @@ def get_wlan_credentials():
     SSID = scan_results[SSID_number - 1][0].decode("utf-8")
     PASS = input(f"Enter WLAN password for {SSID}: ")
     return {SSID,PASS}
-    
 
-def create_setup_file():
-    logger.log("First setup")
-    with open(config_file, "w") as file:
-        file.write("Hier sind einige Standardkonfigurationsdaten.")
-    
 def read_setup_file():
-    logger.log("read_setup_file")
+    windowMaxSteps = configurator.get_value("maxSteps")
+    server_static_ip = configurator.get_value("STATIC_IP")
+    windowOpenProcent = configurator.get_value("openProcent")
 
 def start_server():
     logger.log("Starting server!")
@@ -289,24 +292,19 @@ def start_server():
     except:
         logger.log("Server stoped")
         app.shutdown()
-      
-      
-dir_iterator = os.ilistdir("./")
-setup_config_exists = any(item[0] == "setup_config" and item[1] == 0 for item in dir_iterator)
 
-if not setup_config_exists:
+if not wlan_crodenselts_existing():
     SSID_and_PASS = get_wlan_credentials()
     if connect_to_wifi(SSID_and_PASS):
-        configurator.create_file()
+        logger.log("connected")
     else:
         logger.log("Pls Unluck the EPS and try agine")
         while True:
             time.sleep(1)
-    # create_setup_file()
 else:
-    read_setup_file()
+    connect_static_ip()
 
-    # connect_static_ip()
+read_setup_file()
 start_server()
        
 
@@ -315,6 +313,7 @@ start_server()
 
     
     
+
 
 
 
